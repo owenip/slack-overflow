@@ -36,12 +36,22 @@ exports.handler = (event, context, callback) => {
           response_type: 'in_channel',
           text: `Perhaps one of these links can help!
 ${data.items
-            .map(
-              q => `⬆️ *${q.score.toLocaleString()}* - <${q.link}|${q.title}>`,
-            )
+            .map((q) => {
+                let title = unescapeHtml(q.title);
+                return `⬆️ *${q.score.toLocaleString()}* - <${q.link}|${title}>`
+            })
             .join('\n')}`,
         })
       })
       .catch(error => respond({ text: error.message }))
   }
+}
+
+function unescapeHtml(text) {
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, "\"")
+    .replace(/&#039;/g, "'");
 }

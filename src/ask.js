@@ -36,9 +36,9 @@ exports.handler = (event, context, callback) => {
           response_type: 'in_channel',
           text: `Perhaps one of these links can help!
 ${data.items
-            .map((q) => {
-                let title = unescapeHtml(q.title);
-                return `⬆️ *${q.score.toLocaleString()}* - <${q.link}|${title}>`
+            .map(q => {
+              let title = unescapeHtml(q.title)
+              return `⬆️ *${q.score.toLocaleString()}* - <${q.link}|${title}>`
             })
             .join('\n')}`,
         })
@@ -48,10 +48,13 @@ ${data.items
 }
 
 function unescapeHtml(text) {
-  return text
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, "\"")
-    .replace(/&#039;/g, "'");
+  let entities = require('./entities.json')
+  return text.replace(/&\w+;/g, match => {
+    for (const key of Object.keys(entities)) {
+      if (key === match) {
+        return entities[match]['characters']
+      }
+    }
+    return match
+  })
 }
